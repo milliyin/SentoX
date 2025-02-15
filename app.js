@@ -18,7 +18,7 @@ for (const file of commandFiles) {
   commands.set(command.name, command);
 }
 
-bot.on('message', (msg) => {
+bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
@@ -27,13 +27,21 @@ bot.on('message', (msg) => {
     return;
   }
 
-  // Remove the leading slash and get the command name
-  const commandName = text?.slice(1);
-  const command = commands.get(commandName);
+  // Check if any command is waiting for input
+  for (const command of commands.values()) {
+    if (command.handleMessage && await command.handleMessage(bot, msg)) {
+      return;
+    }
+  }
 
-  if (command) {
-    command.execute(bot, msg);
-    return;
+  // Handle commands
+  if (text?.startsWith('/')) {
+    const commandName = text.slice(1);
+    const command = commands.get(commandName);
+    if (command) {
+      command.execute(bot, msg);
+      return;
+    }
   }
 
   bot.sendMessage(chatId, 'Use /menu to see available options.');
