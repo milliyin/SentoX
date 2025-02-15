@@ -23,7 +23,7 @@ bot.on('message', (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
-    bot.sendMessage(chatId, 'Welcome! I am a simple bot. Use /menu to see available commands.');
+    commands.get('menu').execute(bot, msg);
     return;
   }
 
